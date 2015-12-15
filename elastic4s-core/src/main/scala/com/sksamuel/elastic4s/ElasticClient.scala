@@ -77,9 +77,10 @@ class ElasticClient(val client: org.elasticsearch.client.Client) extends Iterabl
               targetIndex: String,
               chunkSize: Int = 500,
               keepAlive: String = "5m",
-              preserveId: Boolean = true)(implicit ec: ExecutionContext): Future[Unit] = {
+              preserveId: Boolean = true,
+              selector:QueryDefinition = matchAllQuery)(implicit ec: ExecutionContext): Future[Unit] = {
     execute {
-      ElasticDsl.search in sourceIndex limit chunkSize scroll keepAlive searchType SearchType.Scan query matchall
+      ElasticDsl.search in sourceIndex limit chunkSize scroll keepAlive searchType SearchType.Scan query selector
     } flatMap { response =>
 
       def _scroll(scrollId: String): Future[Unit] = {
